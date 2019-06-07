@@ -1,0 +1,945 @@
+{
+	"info": {
+		"_postman_id": "923ae5b8-41a6-4e65-87a2-a8c59564e574",
+		"name": "API platform Rev8 Sales Order Tests",
+		"description": "Sample authentication + ping for Middleware Showroom",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SalesOrder Tests",
+			"item": [
+				{
+					"name": "V1",
+					"item": [
+						{
+							"name": "SalesOrder - CREATE and UPDATE",
+							"item": [
+								{
+									"name": "SalesOrder Create (Only OrderInformation)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "6faee941-3fba-4f0a-ba35-055a51294f51",
+												"exec": [
+													"",
+													"pm.test(\"Status code is 201\", function () {",
+													"    pm.expect(pm.response.code).to.be.oneOf([201]);",
+													"});",
+													"",
+													"if (responseCode.code === 201) {",
+													"    let jsonData = pm.response.json();",
+													"    let salesOrderId = jsonData.salesOrderId",
+													"    if (salesOrderId !== null && salesOrderId !== \"\") {",
+													"        pm.globals.set(\"CreatedSalesOrderId\", salesOrderId);   ",
+													"        pm.test(\"SalesOrderId allocated \" + salesOrderId, function () {",
+													"            pm.expect(jsonData.salesOrderId).to.eql(salesOrderId);",
+													"        });",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"orderInformation\": {\r\n\t\t\"externalSalesOrderReference\": \"27aa0f4d-7b8f-4a06-bb22-a88800e98019\",\r\n\t\t\"orderDate\": \"2018-02-16T08:56:53.280Z\",\r\n\t\t\"handOver\": {\r\n\t\t\t\"deliveryDate\": null,\r\n\t\t\t\"estimatedDeliveryDate\": \"2018-02-16T08:56:53.280Z\"\r\n\t\t},\r\n\t\t\"salesPerson\": {\r\n\t\t\t\"salesPersonId\": \"\",\r\n\t\t\t\"name\": \"API Sales person\"\r\n\t\t},\r\n\t\t\"salesType\": \"RETAIL\",\r\n\t\t\"comments\": \"Sales order comments\"\r\n\t},\r\n\t\"metadata\": {\r\n\t    \"auditData\": {\r\n\t      \"userId\": \"kcc\",\r\n\t      \"userName\": \"API user\"\r\n\t    }\r\n\t}\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders"
+											]
+										},
+										"description": "Create a new sales order containing only the orderInformation section"
+									},
+									"response": []
+								},
+								{
+									"name": "InventoryVehicle Create",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "c4a12f3a-fcdb-4fad-a7f9-c60c24b19361",
+												"exec": [
+													"tests[\"Status code is 201\"] = responseCode.code === 201;",
+													"",
+													"if (responseCode.code === 201) {",
+													"    var jsonData = JSON.parse(responseBody);",
+													"    tests[\"vehicleId\"] = jsonData.vehicleId !== null;",
+													"    ",
+													"    pm.globals.set(\"InventoryVehicleId\", jsonData.vehicleId);",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n            \"status\": \"AVAILABLE\",\r\n            \"inventoryType\": \"USED\",\r\n            \"identification\": {\r\n              \"commissionNumber\": \"test156\",\r\n              \"vin\": \"vin3224156\",\r\n              \"chassis\": \"chasis3224156\",\r\n              \"licensePlate\": \"lic156\",\r\n              \"engineNumber\": \"string\"\r\n            },\r\n            \"description\": {\r\n              \"class\": \"UNKNOWN\",\r\n              \"make\": \"V\",\r\n              \"model\": \"SALOON\",\r\n              \"variant\": \"SUBMODEL1\",\r\n              \"modelYear\": 0,\r\n              \"vehicle\": \"10 LX\",\r\n              \"exteriorColor\": \"string\",\r\n              \"interiorColor\": \"string\"\r\n            },\r\n            \"referenceData\": [\r\n              {\r\n                \"providerId\": \"Test\",\r\n                \"makeCode\": \"VEH\",\r\n                \"modelCode\": \"SALOON\",\r\n                \"variantCode\": \"10LX\",\r\n                \"vehicleCode\": \"string\",\r\n                \"serviceGroupCode\": \"string\"\r\n              }\r\n            ],\r\n            \"ownerDetails\": {\r\n              \"referenceData\": {\r\n                \"externalVehicleId\": \"string\"\r\n              },\r\n              \"contact\": {\r\n                \"companyName\": \"string\",\r\n                \"contactName\": \"string\",\r\n                \"addresses\": {\r\n                  \"physicalAddress\": {\r\n                    \"streetName\": \"string\",\r\n                    \"houseNumber\": \"string\",\r\n                    \"buildingName\": \"string\",\r\n                    \"floorNumber\": \"string\",\r\n                    \"doorNumber\": \"string\",\r\n                    \"blockName\": \"string\",\r\n                    \"postalCode\": \"string\",\r\n                    \"suburb\": \"string\",\r\n                    \"city\": \"string\",\r\n                    \"county\": \"string\",\r\n                    \"province\": \"string\",\r\n                    \"countryCode\": \"string\"\r\n                  },\r\n                  \"postalAddress\": {\r\n                    \"poBoxName\": \"string\",\r\n                    \"poBoxNumber\": \"string\",\r\n                    \"poBoxSuite\": \"string\",\r\n                    \"postalCode\": \"string\",\r\n                    \"suburb\": \"string\",\r\n                    \"city\": \"string\",\r\n                    \"county\": \"string\",\r\n                    \"province\": \"string\",\r\n                    \"countryCode\": \"string\"\r\n                  }\r\n                },\r\n                \"contactInformation\": {\r\n                  \"landline\": \"string\",\r\n                  \"fax\": \"string\",\r\n                  \"email\": \"string\"\r\n                }\r\n              }\r\n            },\r\n            \"specification\": {\r\n              \"primaryExteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"METALLIC\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"secondaryExteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"METALLIC\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"primaryInteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"LEATHER\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"secondaryInteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"LEATHER\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"optionPacks\": [\r\n                {\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\",\r\n                  \"type\": \"MANUFACTURERSTANDARD\",\r\n                  \"packPrices\": {\r\n                    \"costPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    },\r\n                    \"listPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    }\r\n                  },\r\n                  \"options\": [\r\n                    {\r\n                      \"type\": \"MANUFACTURERSTANDARD\",\r\n                      \"code\": \"string\",\r\n                      \"description\": \"string\",\r\n                      \"optionPrices\": {\r\n                        \"costPrice\": {\r\n                          \"netValue\": 0,\r\n                          \"grossValue\": 0,\r\n                          \"taxValue\": 0,\r\n                          \"taxRate\": 0,\r\n                          \"currencyCode\": \"string\"\r\n                        },\r\n                        \"listPrice\": {\r\n                          \"netValue\": 0,\r\n                          \"grossValue\": 0,\r\n                          \"taxValue\": 0,\r\n                          \"taxRate\": 0,\r\n                          \"currencyCode\": \"string\"\r\n                        }\r\n                      }\r\n                    }\r\n                  ]\r\n                }\r\n              ],\r\n              \"options\": [\r\n                {\r\n                  \"type\": \"MANUFACTURERSTANDARD\",\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\",\r\n                  \"optionPrices\": {\r\n                    \"costPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    },\r\n                    \"listPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    }\r\n                  }\r\n                }\r\n              ]\r\n            },\r\n            \"mileage\": {\r\n              \"unit\": \"KM\",\r\n              \"value\": 0\r\n            },\r\n            \"dates\": {\r\n              \"registrationDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"firstRegistrationDate\": \"2018-07-19T04:22:58.102Z\"\r\n            },\r\n            \"prices\": {\r\n              \"listPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"costPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"deliveryPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"nonRecoverableCosts\": [\r\n                {\r\n                  \"actualCost\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"estimatedCost\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\"\r\n                }\r\n              ]\r\n            },\r\n            \"isVatQualifyingVehicle\": true,\r\n            \"inventoryDates\": {\r\n              \"orderDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"buildDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"estimatedReceivedDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"receivedDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"availableForSaleDate\": \"2018-07-19T04:22:58.102Z\"\r\n            },\r\n            \"reservation\": {\r\n              \"reservationDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"reservedUntilDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"reservedBy\": {\r\n                \"salesPersonId\": \"string\",\r\n                \"name\": \"string\"\r\n              }\r\n            },\r\n            \"technicalData\": {\r\n              \"engineConcept\": \"UNKNOWN\",\r\n              \"primaryEngine\": {\r\n                \"fuelType\": \"DIESEL\",\r\n                \"engineNumber\": \"string\",\r\n                \"cylinderCapacity\": 0,\r\n                \"enginePower\": {\r\n                  \"horsePower\": 0,\r\n                  \"kiloWatts\": 0\r\n                }\r\n              },\r\n              \"secondaryEngine\": {\r\n                \"fuelType\": \"DIESEL\",\r\n                \"engineNumber\": \"string\",\r\n                \"cylinderCapacity\": 0,\r\n                \"enginePower\": {\r\n                  \"horsePower\": 0,\r\n                  \"kiloWatts\": 0\r\n                }\r\n              },\r\n              \"steering\": \"LEFT\",\r\n              \"transmission\": {\r\n                \"transmissionType\": \"AUTOMATIC\",\r\n                \"numberOfGears\": 0\r\n              },\r\n              \"numberOfDoors\": 0,\r\n              \"numberOfSeats\": 0,\r\n              \"electricRange\": {\r\n                \"unit\": \"KM\",\r\n                \"value\": 0\r\n              },\r\n              \"fuelTank\": {\r\n                \"capacity\": 0,\r\n                \"capacityUnit\": \"LITRES\"\r\n              },\r\n              \"testRegimeData\": {\r\n                \"regimeType\": \"NEDC\",\r\n                \"regimeData\": [\r\n                  {\r\n                    \"level\": \"TOTAL\",\r\n                    \"consumption\": {\r\n                      \"unit\": \"l/100km\",\r\n                      \"cycles\": [\r\n                        {\r\n                          \"type\": \"COMBINED\",\r\n                          \"value\": 0\r\n                        }\r\n                      ]\r\n                    },\r\n                    \"emission\": {\r\n                      \"unit\": \"g/km\",\r\n                      \"cycles\": [\r\n                        {\r\n                          \"type\": \"COMBINED\",\r\n                          \"value\": 0\r\n                        }\r\n                      ],\r\n                      \"nox\": 0\r\n                    }\r\n                  }\r\n                ]\r\n              }\r\n            },\r\n            \"metadata\": {\r\n              \"auditData\": {\r\n                \"userId\": \"kcc\",\r\n                \"userName\": \"ADPadp11\"\r\n              }\r\n            }\r\n          }"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/inventory-vehicles",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"inventory-vehicles"
+											]
+										},
+										"description": "Create an new inventory vehicle"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Create (Full sales order)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "753f3adc-4b9c-428e-953e-cb50750c3aa2",
+												"exec": [
+													"",
+													"pm.test(\"Status code is 201\", function () {",
+													"    pm.expect(pm.response.code).to.be.oneOf([201]);",
+													"});",
+													"",
+													"if (responseCode.code === 201) {",
+													"    let jsonData = pm.response.json();",
+													"    let salesOrderId = jsonData.salesOrderId",
+													"    if (salesOrderId !== null && salesOrderId !== \"\") {",
+													"        pm.globals.set(\"SalesOrderId\", salesOrderId);   ",
+													"        pm.test(\"SalesOrderId allocated \" + salesOrderId, function () {",
+													"            pm.expect(jsonData.salesOrderId).to.eql(salesOrderId);",
+													"        });",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"orderInformation\": {\r\n        \"externalSalesOrderReference\": \"27aa0f4d-7b8f-4a06-bb22-a88800e98019\",\r\n        \"orderDate\": \"2018-02-16T08:56:53.28Z\",\r\n        \"handOver\": {\r\n            \"deliveryDate\": \"2018-02-16T08:56:53.28Z\",\r\n            \"estimatedDeliveryDate\": \"2018-02-16T08:56:53.28Z\"\r\n        },\r\n        \"salesPerson\": {\r\n            \"salesPersonId\": \"api-sa01\",\r\n            \"name\": \"API Sales person\"\r\n        },\r\n        \"salesType\": \"RETAIL\",\r\n        \"comments\": \"Delivery date has been set\"\r\n    },\r\n    \"invoiceParties\": {\r\n        \"mainInvoiceParty\": {\r\n            \"payeeType\": \"FINANCE\",\r\n            \"payee\": {\r\n                \"customerId\": null,\r\n                \"companyId\": null,\r\n                \"payeeName\": \"Andrew Bell\",\r\n                \"addresses\": {\r\n                    \"home\": {\r\n                        \"physicalAddress\": {\r\n                            \"streetName\": \"Swanston Crescent\",\r\n                            \"houseNumber\": \"21\",\r\n                            \"buildingName\": null,\r\n                            \"floorNumber\": null,\r\n                            \"doorNumber\": null,\r\n                            \"blockName\": null,\r\n                            \"postalCode\": \"BT365DW\",\r\n                            \"suburb\": \"\",\r\n                            \"city\": \"Newtownabbey\",\r\n                            \"county\": \"County Antrim\",\r\n                            \"province\": null,\r\n                            \"countryCode\": \"EUR\"\r\n                        },\r\n                        \"postalAddress\": null\r\n                    }\r\n                },\r\n                \"contactInformation\": null\r\n            },\r\n            \"invoiceValue\": {\r\n                \"netValue\": 4491.83,\r\n                \"grossValue\": 5000,\r\n                \"taxValue\": 8.17,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            },\r\n            \"finance\": {\r\n                \"schemeName\": \"Scheme name\",\r\n                \"rate\": 10,\r\n                \"period\": 24,\r\n                \"periodUnit\": \"MONTH\",\r\n                \"periodPayment\": {\r\n                    \"netValue\": 250,\r\n                    \"grossValue\": 250,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"yearlyMileage\": 0,\r\n                \"mileageUnit\": \"KM\",\r\n                \"guaranteedFutureValue\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"initialPayment\": {\r\n                    \"netValue\": 5100,\r\n                    \"grossValue\": 5100,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"financeType\": \"LEASE\"\r\n            },\r\n            \"deposit\": {\r\n                \"depositToPay\": {\r\n                    \"netValue\": 5000,\r\n                    \"grossValue\": 5000,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"depositsTaken\": [\r\n                    {\r\n                        \"amount\": {\r\n                            \"netValue\": 500,\r\n                            \"grossValue\": 500,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"paymentMethod\": \"CASH\",\r\n                        \"receiptNumber\": \"CashReceipt011\",\r\n                        \"notes\": \"Payed by card\"\r\n                    }\r\n                ]\r\n            }\r\n        },\r\n        \"supplementaryInvoiceParty\": {\r\n            \"payeeType\": \"INDIVIDUAL\",\r\n            \"payee\": {\r\n                \"customerId\": null,\r\n                \"companyId\": null,\r\n                \"payeeName\": \"Andrew Bell\",\r\n                \"addresses\": {\r\n                    \"home\": {\r\n                        \"physicalAddress\": {\r\n                            \"streetName\": \"Swanston Crescent\",\r\n                            \"houseNumber\": \"21\",\r\n                            \"buildingName\": null,\r\n                            \"floorNumber\": null,\r\n                            \"doorNumber\": null,\r\n                            \"blockName\": null,\r\n                            \"postalCode\": \"BT365DW\",\r\n                            \"suburb\": null,\r\n                            \"city\": \"Newtownabbey\",\r\n                            \"county\": \"County Antrim\",\r\n                            \"province\": null,\r\n                            \"countryCode\": \"GB\"\r\n                        },\r\n                        \"postalAddress\": null\r\n                    }\r\n                },\r\n                \"contactInformation\": null\r\n            },\r\n            \"invoiceValue\": {\r\n                \"netValue\": 100,\r\n                \"grossValue\": 100,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            },\r\n            \"finance\": null,\r\n            \"deposit\": {\r\n                \"depositToPay\": {\r\n                    \"netValue\": 100,\r\n                    \"grossValue\": 100,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"depositsTaken\": [\r\n                    {\r\n                        \"amount\": {\r\n                            \"netValue\": 100,\r\n                            \"grossValue\": 100,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"paymentMethod\": \"CASH\",\r\n                        \"receiptNumber\": \"445784\",\r\n                        \"notes\": \"\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    },\r\n    \"contactParties\": {\r\n        \"salesContact\": {\r\n            \"customerId\": null,\r\n            \"companyId\": null,\r\n            \"payeeName\": \"Andrew Bell\",\r\n            \"addresses\": {\r\n                \"home\": {\r\n                    \"physicalAddress\": {\r\n                        \"streetName\": \"Swanston Crescent\",\r\n                        \"houseNumber\": \"21\",\r\n                        \"buildingName\": null,\r\n                        \"floorNumber\": null,\r\n                        \"doorNumber\": null,\r\n                        \"blockName\": null,\r\n                        \"postalCode\": \"BT365DW\",\r\n                        \"suburb\": \"\",\r\n                        \"city\": \"Newtownabbey\",\r\n                        \"county\": \"County Antrim\",\r\n                        \"province\": null,\r\n                        \"countryCode\": \"GB\"\r\n                    },\r\n                    \"postalAddress\": null\r\n                }\r\n            },\r\n            \"contactInformation\": null\r\n        }\r\n    },\r\n    \"vehicles\": [\r\n        {\r\n            \"vehicleId\": \"{{InventoryVehicleId}}\",\r\n            \"prices\": {\r\n                \"listPrice\": {\r\n                    \"netValue\": 8688,\r\n                    \"grossValue\": 8688,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"costPrice\": null,\r\n                \"deliveryPrice\": {\r\n                    \"netValue\": 120,\r\n                    \"grossValue\": 120,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"nonRecoverableCosts\": [\r\n                    {\r\n                        \"actualCost\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"string\"\r\n                        },\r\n                        \"estimatedCost\": {\r\n                            \"netValue\": 35.28,\r\n                            \"grossValue\": 35.28,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"code\": \"PLATES\",\r\n                        \"description\": \"Number Plates LXZ6710\"\r\n                    },\r\n                    {\r\n                        \"actualCost\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"string\"\r\n                        },\r\n                        \"estimatedCost\": {\r\n                            \"netValue\": 234,\r\n                            \"grossValue\": 234,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"code\": \"CHECKREP\",\r\n                        \"description\": \"Check and Report (Multipoint Check)\"\r\n                    },\r\n                    {\r\n                        \"actualCost\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"string\"\r\n                        },\r\n                        \"estimatedCost\": {\r\n                            \"netValue\": 150,\r\n                            \"grossValue\": 150,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"code\": \"LUBSERV\",\r\n                        \"description\": \"Lube Service\"\r\n                    },\r\n                    {\r\n                        \"actualCost\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"string\"\r\n                        },\r\n                        \"estimatedCost\": {\r\n                            \"netValue\": 260,\r\n                            \"grossValue\": 260,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"code\": \"HOUSECHG\",\r\n                        \"description\": \"House Charge\"\r\n                    }\r\n                ]\r\n            },\r\n            \"specification\": {\r\n                \"primaryExteriorColor\": {\r\n                    \"code\": \"133\",\r\n                    \"description\": \"Metallic black\",\r\n                    \"colorType\": \"METALLIC\",\r\n                    \"prices\": {\r\n                        \"costPrice\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"listPrice\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        }\r\n                    }\r\n                },\r\n                \"secondaryExteriorColor\": null,\r\n                \"primaryInteriorColor\": {\r\n                    \"code\": \"455\",\r\n                    \"description\": \"Nappa lether brown\",\r\n                    \"colorType\": \"LEATHER\",\r\n                    \"prices\": {\r\n                        \"costPrice\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"listPrice\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        }\r\n                    }\r\n                },\r\n                \"secondaryInteriorColor\": null,\r\n                \"optionPacks\": [],\r\n                \"options\": [\r\n                    {\r\n                        \"type\": \"DEALERINSTALLED\",\r\n                        \"code\": \"WARRAPPROV\",\r\n                        \"description\": \"Approved Volkswagen Warranty 12 mth\",\r\n                        \"optionPrices\": {\r\n                            \"costPrice\": null,\r\n                            \"listPrice\": {\r\n                                \"netValue\": 0,\r\n                                \"grossValue\": 0,\r\n                                \"taxValue\": 0,\r\n                                \"taxRate\": 0,\r\n                                \"currencyCode\": \"string\"\r\n                            }\r\n                        }\r\n                    },\r\n                    {\r\n                        \"type\": \"DEALERINSTALLED\",\r\n                        \"code\": \"DISCOUNT\",\r\n                        \"description\": \"Dealership Contribution\",\r\n                        \"optionPrices\": {\r\n                            \"costPrice\": null,\r\n                            \"listPrice\": {\r\n                                \"netValue\": -336,\r\n                                \"grossValue\": -336,\r\n                                \"taxValue\": 0,\r\n                                \"taxRate\": 0,\r\n                                \"currencyCode\": \"EUR\"\r\n                            }\r\n                        }\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ],\r\n    \"tradeInVehicles\": [\r\n        {\r\n            \"vehicleId\": null,\r\n            \"description\": {\r\n                \"class\": \"CAR\",\r\n                \"make\": \"Volkswagen\",\r\n                \"model\": \"POLO HATCHBACK - 2009\",\r\n                \"variant\": \"1.2 60 Match 5dr\",\r\n                \"modelYear\": 0,\r\n                \"vehicle\": \"1.2 60 Match 5dr\",\r\n                \"exteriorColor\": \"Grey\",\r\n                \"interiorColor\": \"Black\"\r\n            },\r\n            \"identification\": {\r\n                \"vin\": \"WVWZZZ6RZCU064781\",\r\n                \"chassis\": null,\r\n                \"licensePlate\": \"TJZ7536\",\r\n                \"engineNumber\": \"CFFD45166\"\r\n            },\r\n             \"mileage\": {\r\n\t\t        \"unit\": \"KM\",\r\n\t\t        \"value\": 2\r\n\t\t    },\r\n            \"referenceData\": {\r\n                \"providerId\": \"CAP\",\r\n                \"makeCode\": \"BEC\",\r\n                \"modelCode\": \"62670\",\r\n                \"variantCode\": \"58605\",\r\n                \"vehicleCode\": \"VWBE20DSN2BDTM  2   2013S\",\r\n                \"serviceGroupCode\": \"string\"\r\n            },\r\n            \"technicalData\": {\r\n                \"engineConcept\": \"DIESEL\",\r\n                \"engines\": [\r\n                    {\r\n                        \"engineType\": \"PRIMARY\",\r\n                        \"fuelType\": \"DIESEL\",\r\n                        \"engineNumber\": \"CFFD45166\",\r\n                        \"cylinderCapacity\": 2143,\r\n                        \"enginePower\": {\r\n                            \"horsePower\": 0,\r\n                            \"kiloWatts\": 0\r\n                        }\r\n                    }\r\n                ],\r\n                \"steering\": \"LEFT\",\r\n                \"transmission\": {\r\n                    \"transmissionType\": \"AUTOMATIC\",\r\n                    \"numberOfGears\": 0\r\n                },\r\n                \"numberOfDoors\": 5,\r\n                \"numberOfSeats\": 4,\r\n                \"electricRange\": null,\r\n                \"fuelTank\": {\r\n                    \"capacity\": 45,\r\n                    \"capacityUnit\": \"LITRES\"\r\n                },\r\n                \"testRegimeData\": null\r\n            },\r\n            \"dates\": {\r\n                \"registrationDate\": \"2017-02-26\",\r\n                \"firstRegistrationDate\": \"2015-01-10\"\r\n            },\r\n            \"valuationPrice\": {\r\n                \"netValue\": 8570,\r\n                \"grossValue\": 8570,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            },\r\n            \"outstandingFinanceValue\": {\r\n                \"netValue\": 1000,\r\n                \"grossValue\": 1000,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            },\r\n            \"offerPrice\": {\r\n                \"netValue\": 9500,\r\n                \"grossValue\": 9500,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            }\r\n        }\r\n    ],\r\n    \"metadata\": {\r\n    \"auditData\": {\r\n      \"userId\": \"kcc\",\r\n      \"userName\": \"string\"\r\n    }\r\n  }\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders"
+											]
+										},
+										"description": "Create a new sales order containing only the orderInformation section"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Update OrderInformation",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "630f30f1-fca1-4292-8ab5-c8cbc95223f4",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"orderInformation\": {\r\n\t\t\"externalSalesOrderReference\": \"27aa0f4d-7b8f-4a06-bb22-a88800e98019\",\r\n\t\t\"orderDate\": \"2018-02-16T08:56:53.280Z\",\r\n\t\t\"handOver\": {\r\n\t\t\t\"deliveryDate\": \"2018-02-16T08:56:53.280Z\",\r\n\t\t\t\"estimatedDeliveryDate\": \"2018-02-16T08:56:53.280Z\"\r\n\t\t},\r\n\t\t\"salesPerson\": {\r\n\t\t\t\"salesPersonId\": \"\",\r\n\t\t\t\"name\": \"API Sales person\"\r\n\t\t},\r\n\t\t\"salesType\": \"RETAIL\",\r\n\t\t\"comments\": \"Delivery date has been set\"\r\n\t},\r\n\t\"metadata\": {\r\n\t    \"auditData\": {\r\n\t      \"userId\": \"kcc\",\r\n\t      \"userName\": \"API user\"\r\n\t    }\r\n\t}\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/update-information",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"update-information"
+											]
+										},
+										"description": "Create a new sales order containing only the orderInformation section"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Update Invoice parties",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "e9f87464-41dd-4efd-a829-b6648f989639",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"invoiceParties\": {\r\n    \"mainInvoiceParty\": {\r\n      \"payeeType\": \"FINANCE\",\r\n      \"payee\": {\r\n        \"customerId\": null,\r\n        \"companyId\": null,\r\n        \"payeeName\": \"Andrew Bell\",\r\n        \"addresses\": {\r\n          \"home\": {\r\n            \"physicalAddress\": {\r\n              \"streetName\": \"Swanston Crescent\",\r\n              \"houseNumber\": \"21\",\r\n              \"postalCode\": \"BT365DW\",\r\n              \"suburb\": \"\",\r\n              \"city\": \"Newtownabbey\",\r\n              \"county\": \"County Antrim\",\r\n              \"countryCode\": \"EUR\"\r\n            }\r\n          }\r\n        },\r\n        \"contactInformations\": {\r\n          \"home\": {\r\n            \"mobile\": null,\r\n            \"landline\": null,\r\n            \"fax\": null,\r\n            \"email\": null\r\n          },\r\n          \"work\": {\r\n            \"mobile\": null,\r\n            \"landline\": null,\r\n            \"fax\": null,\r\n            \"email\": null\r\n          }\r\n        }\r\n      },\r\n      \"invoiceValue\": {\r\n        \"netValue\": 4491.83,\r\n        \"grossValue\": 5000,\r\n        \"taxValue\": 8.17,\r\n        \"taxRate\": 0,\r\n        \"currencyCode\": \"EUR\"\r\n      },\r\n      \"finance\": {\r\n        \"schemeName\": \"Scheme name\",\r\n        \"rate\": 10,\r\n        \"period\": 24,\r\n        \"periodUnit\": \"MONTH\",\r\n        \"periodPayment\": {\r\n          \"netValue\": 250,\r\n          \"grossValue\": 250,\r\n          \"taxValue\": 0,\r\n          \"taxRate\": 0,\r\n          \"currencyCode\": \"GBP\"\r\n        },\r\n        \"yearlyMileage\": 0,\r\n        \"mileageUnit\": \"KM\",\r\n        \"guaranteedFutureValue\": {\r\n          \"netValue\": 0,\r\n          \"grossValue\": 0,\r\n          \"taxValue\": 0,\r\n          \"taxRate\": 0,\r\n          \"currencyCode\": \"EUR\"\r\n        },\r\n        \"initialPayment\": {\r\n          \"netValue\": 5100,\r\n          \"grossValue\": 5100,\r\n          \"taxValue\": 0,\r\n          \"taxRate\": 0,\r\n          \"currencyCode\": \"EUR\"\r\n        },\r\n        \"financeType\": \"LEASE\"\r\n      },\r\n      \"deposit\": {\r\n        \"depositToPay\": {\r\n          \"netValue\": 5000,\r\n          \"grossValue\": 5000,\r\n          \"taxValue\": 0,\r\n          \"taxRate\": 0,\r\n          \"currencyCode\": \"EUR\"\r\n        },\r\n        \"depositsTaken\": [\r\n          {\r\n            \"amount\": {\r\n              \"netValue\": 500,\r\n              \"grossValue\": 500,\r\n              \"taxValue\": 0,\r\n              \"taxRate\": 0,\r\n              \"currencyCode\": \"EUR\"\r\n            },\r\n            \"paymentMethod\": \"CASH\",\r\n            \"receiptNumber\": \"CashReceipt011\",\r\n            \"notes\": \"Payed by card\"\r\n          }\r\n        ]\r\n      }\r\n    },\r\n    \"supplementaryInvoiceParty\": {\r\n      \"payeeType\": \"INDIVIDUAL\",\r\n      \"payee\": {\r\n        \"customerId\": null,\r\n        \"companyId\": null,\r\n        \"payeeName\": \"Andrew Bell\",\r\n        \"addresses\": {\r\n          \"home\": {\r\n            \"physicalAddress\": {\r\n              \"streetName\": \"Swanston Crescent\",\r\n              \"houseNumber\": \"21\",\r\n              \"buildingName\": null,\r\n              \"floorNumber\": null,\r\n              \"doorNumber\": null,\r\n              \"blockName\": null,\r\n              \"postalCode\": \"BT365DW\",\r\n              \"suburb\": null,\r\n              \"city\": \"Newtownabbey\",\r\n              \"county\": \"County Antrim\",\r\n              \"province\": null,\r\n              \"countryCode\": \"GB\"\r\n            },\r\n            \"postalAddress\": null\r\n          }\r\n        },\r\n        \"contactInformations\": {\r\n          \"home\": {\r\n            \"mobile\": null,\r\n            \"landline\": null,\r\n            \"fax\": null,\r\n            \"email\": null\r\n          },\r\n          \"work\": {\r\n            \"mobile\": null,\r\n            \"landline\": null,\r\n            \"fax\": null,\r\n            \"email\": null\r\n          }\r\n        }\r\n      },\r\n      \"invoiceValue\": {\r\n        \"netValue\": 100,\r\n        \"grossValue\": 100,\r\n        \"taxValue\": 0,\r\n        \"taxRate\": 0,\r\n        \"currencyCode\": \"EUR\"\r\n      },\r\n      \"finance\": null,\r\n      \"deposit\": {\r\n        \"depositToPay\": {\r\n          \"netValue\": 100,\r\n          \"grossValue\": 100,\r\n          \"taxValue\": 0,\r\n          \"taxRate\": 0,\r\n          \"currencyCode\": \"EUR\"\r\n        },\r\n        \"depositsTaken\": [\r\n          {\r\n            \"amount\": {\r\n              \"netValue\": 100,\r\n              \"grossValue\": 100,\r\n              \"taxValue\": 0,\r\n              \"taxRate\": 0,\r\n              \"currencyCode\": \"EUR\"\r\n            },\r\n            \"paymentMethod\": \"CASH\",\r\n            \"receiptNumber\": \"445784\",\r\n            \"notes\": \"\"\r\n          }\r\n        ]\r\n      }\r\n    }\r\n  },\r\n  \"metadata\": {\r\n\t    \"auditData\": {\r\n\t      \"userId\": \"kcc\",\r\n\t      \"userName\": \"API user\"\r\n\t    }\r\n\t}\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/update-invoice-parties",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"update-invoice-parties"
+											]
+										},
+										"description": "Create a new sales order containing only the orderInformation section"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Update - contact parties",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "dc79d4d9-93e5-4543-9fbf-98cee93fa5e6",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"",
+													"if (responseCode.code === 201) {",
+													"    var jsonData = JSON.parse(responseBody);",
+													"    tests[\"OrderStatus\"] = jsonData.salesOrderInformation.orderStatus === \"InProgress\";",
+													"    tests[\"Delivery date\"] = jsonData.salesOrderInformation.handOver.deliveryDate === \"2018-01-02T00:00:00Z\";",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"contactParties\": {\r\n    \"salesContact\": {\r\n      \"customerId\": null,\r\n      \"companyId\": null,\r\n      \"payeeName\": \"Andrew Bell\",\r\n        \"addresses\": {\r\n          \"home\": {\r\n            \"physicalAddress\": {\r\n              \"streetName\": \"Swanston Crescent\",\r\n              \"houseNumber\": \"21\",\r\n              \"postalCode\": \"BT365DW\",\r\n              \"suburb\": \"\",\r\n              \"city\": \"Newtownabbey\",\r\n              \"county\": \"County Antrim\",\r\n              \"countryCode\": \"GB\"\r\n            }\r\n          }\r\n        },\r\n      \"contactInformations\": {\r\n        \"home\": {\r\n          \"mobile\":null,\r\n          \"landline\": null,\r\n          \"fax\": null,\r\n          \"email\": null\r\n        },\r\n        \"work\": {\r\n          \"mobile\": null,\r\n          \"landline\": \"0362 521 7220\",\r\n          \"fax\": null,\r\n          \"email\": null\r\n        }\r\n      }\r\n    }\r\n  },\r\n  \"metadata\": {\r\n    \"auditData\": {\r\n      \"userId\": \"kcc\",\r\n      \"userName\": \"API Sales user\"\r\n    }\r\n  }\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/update-contact-parties",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"update-contact-parties"
+											]
+										},
+										"description": "Add the sales contact\t party to the sales order\t"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Update - Remove inventory vehicle",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "4842670f-9e75-4ac7-8ee4-9ebf57d63cef",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"vehicleId\": \"{{InventoryVehicleId}}\",\r\n\t\"metadata\": {\r\n\t\t\"auditData\": {\r\n\t\t\t\"userId\": \"{{UserId}}\",\r\n\t\t\t\"userName\": \"API Sales user\"\r\n\t\t}\r\n\t}\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/remove-inventory-vehicle",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"remove-inventory-vehicle"
+											]
+										},
+										"description": "Add the sales contact\t party to the sales order\t"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Update - Add inventory vehicle",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "941cb9ae-516d-4969-968f-80f86111bd31",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"vehicle\": {\r\n\t\t\"vehicleId\": \"{{InventoryVehicleId}}\",\r\n\t\t\"prices\": {\r\n\t\t\t\"listPrice\": {\r\n\t\t\t\t\"netValue\": 8688,\r\n\t\t\t\t\"grossValue\": 8688,\r\n\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\"currencyCode\": \"GBP\"\r\n\t\t\t},\r\n\t\t\t\"costPrice\": null,\r\n\t\t\t\"deliveryPrice\": {\r\n\t\t\t    \"netValue\": 120,\r\n\t\t\t    \"grossValue\": 120,\r\n\t\t\t    \"taxValue\": 0,\r\n\t\t\t    \"taxRate\": 0,\r\n\t\t\t     \"currencyCode\": \"GBP\"\r\n\t\t\t},\t\t\t\r\n\t\t\t\"nonRecoverableCosts\": [\r\n\t\t\t\t{\r\n\t\t\t\t\t\"actualCost\": {\r\n\t\t\t\t\t\t\"netValue\": 0,\r\n\t\t\t\t\t\t\"grossValue\": 0,\r\n\t\t\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\t\t\"currencyCode\": \"string\"\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"estimatedCost\": {\r\n\t\t\t\t\t\t\"netValue\": 35.28,\r\n\t\t\t\t\t\t\"grossValue\": 35.28,\r\n\t\t\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\t\t\"currencyCode\": \"GBP\"\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"code\": \"PLATES\",\r\n\t\t\t\t\t\"description\": \"Number Plates LXZ6710\"\r\n\t\t\t\t}, {\r\n\t\t\t\t\t\"actualCost\": {\r\n\t\t\t\t\t\t\"netValue\": 0,\r\n\t\t\t\t\t\t\"grossValue\": 0,\r\n\t\t\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\t\t\"currencyCode\": \"string\"\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"estimatedCost\": {\r\n\t\t\t\t\t\t\"netValue\": 234,\r\n\t\t\t\t\t\t\"grossValue\": 234,\r\n\t\t\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\t\t\"currencyCode\": \"GBP\"\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"code\": \"CHECKREP\",\r\n\t\t\t\t\t\"description\": \"Check and Report (Multipoint Check)\"\r\n\t\t\t\t}, {\r\n\t\t\t\t\t\"actualCost\": {\r\n\t\t\t\t\t\t\"netValue\": 0,\r\n\t\t\t\t\t\t\"grossValue\": 0,\r\n\t\t\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\t\t\"currencyCode\": \"string\"\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"estimatedCost\": {\r\n\t\t\t\t\t\t\"netValue\": 150,\r\n\t\t\t\t\t\t\"grossValue\": 150,\r\n\t\t\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\t\t\"currencyCode\": \"GBP\"\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"code\": \"LUBSERV\",\r\n\t\t\t\t\t\"description\": \"Lube Service\"\r\n\t\t\t\t}, {\r\n\t\t\t\t\t\"actualCost\": {\r\n\t\t\t\t\t\t\"netValue\": 0,\r\n\t\t\t\t\t\t\"grossValue\": 0,\r\n\t\t\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\t\t\"currencyCode\": \"string\"\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"estimatedCost\": {\r\n\t\t\t\t\t\t\"netValue\": 260,\r\n\t\t\t\t\t\t\"grossValue\": 260,\r\n\t\t\t\t\t\t\"taxValue\": 0,\r\n\t\t\t\t\t\t\"taxRate\": 0,\r\n\t\t\t\t\t\t\"currencyCode\": \"GBP\"\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"code\": \"HOUSECHG\",\r\n\t\t\t\t\t\"description\": \"House Charge\"\r\n\t\t\t\t}\r\n\t\t\t]\r\n\t\t},\r\n\t\t\"specification\": {\r\n              \"primaryExteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"METALLIC\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"secondaryExteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"METALLIC\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"primaryInteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"LEATHER\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"secondaryInteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"LEATHER\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"optionPacks\": [\r\n                {\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\",\r\n                  \"type\": \"MANUFACTURERSTANDARD\",\r\n                  \"packPrices\": {\r\n                    \"costPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    },\r\n                    \"listPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    }\r\n                  },\r\n                  \"options\": [\r\n                    {\r\n                      \"type\": \"MANUFACTURERSTANDARD\",\r\n                      \"code\": \"string\",\r\n                      \"description\": \"string\",\r\n                      \"optionPrices\": {\r\n                        \"costPrice\": {\r\n                          \"netValue\": 0,\r\n                          \"grossValue\": 0,\r\n                          \"taxValue\": 0,\r\n                          \"taxRate\": 0,\r\n                          \"currencyCode\": \"string\"\r\n                        },\r\n                        \"listPrice\": {\r\n                          \"netValue\": 0,\r\n                          \"grossValue\": 0,\r\n                          \"taxValue\": 0,\r\n                          \"taxRate\": 0,\r\n                          \"currencyCode\": \"string\"\r\n                        }\r\n                      }\r\n                    }\r\n                  ]\r\n                }\r\n              ],\r\n              \"options\": [\r\n                {\r\n                  \"type\": \"MANUFACTURERSTANDARD\",\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\",\r\n                  \"optionPrices\": {\r\n                    \"costPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    },\r\n                    \"listPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    }\r\n                  }\r\n                }\r\n              ]\r\n            },\r\n            \"mileage\": {\r\n              \"unit\": \"KM\",\r\n              \"value\": 0\r\n            },\r\n            \"dates\": {\r\n              \"registrationDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"firstRegistrationDate\": \"2018-07-19T04:22:58.102Z\"\r\n            },\r\n            \"prices\": {\r\n              \"listPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"costPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"deliveryPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"nonRecoverableCosts\": [\r\n                {\r\n                  \"actualCost\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"estimatedCost\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\"\r\n                }\r\n              ]\r\n            },\r\n            \"isVatQualifyingVehicle\": true,\r\n            \"inventoryDates\": {\r\n              \"orderDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"buildDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"estimatedReceivedDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"receivedDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"availableForSaleDate\": \"2018-07-19T04:22:58.102Z\"\r\n            },\r\n            \"reservation\": {\r\n              \"reservationDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"reservedUntilDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"reservedBy\": {\r\n                \"salesPersonId\": \"string\",\r\n                \"name\": \"string\"\r\n              }\r\n            },\r\n            \"technicalData\": {\r\n              \"engineConcept\": \"UNKNOWN\",\r\n              \"primaryEngine\": {\r\n                \"fuelType\": \"DIESEL\",\r\n                \"engineNumber\": \"string\",\r\n                \"cylinderCapacity\": 0,\r\n                \"enginePower\": {\r\n                  \"horsePower\": 0,\r\n                  \"kiloWatts\": 0\r\n                }\r\n              },\r\n              \"secondaryEngine\": {\r\n                \"fuelType\": \"DIESEL\",\r\n                \"engineNumber\": \"string\",\r\n                \"cylinderCapacity\": 0,\r\n                \"enginePower\": {\r\n                  \"horsePower\": 0,\r\n                  \"kiloWatts\": 0\r\n                }\r\n              },\r\n              \"steering\": \"LEFT\",\r\n              \"transmission\": {\r\n                \"transmissionType\": \"AUTOMATIC\",\r\n                \"numberOfGears\": 0\r\n              },\r\n              \"numberOfDoors\": 0,\r\n              \"numberOfSeats\": 0,\r\n              \"electricRange\": {\r\n                \"unit\": \"KM\",\r\n                \"value\": 0\r\n              },\r\n              \"fuelTank\": {\r\n                \"capacity\": 0,\r\n                \"capacityUnit\": \"LITRES\"\r\n              },\r\n              \"testRegimeData\": {\r\n                \"regimeType\": \"NEDC\",\r\n                \"regimeData\": [\r\n                  {\r\n                    \"level\": \"TOTAL\",\r\n                    \"consumption\": {\r\n                      \"unit\": \"l/100km\",\r\n                      \"cycles\": [\r\n                        {\r\n                          \"type\": \"COMBINED\",\r\n                          \"value\": 0\r\n                        }\r\n                      ]\r\n                    },\r\n                    \"emission\": {\r\n                      \"unit\": \"g/km\",\r\n                      \"cycles\": [\r\n                        {\r\n                          \"type\": \"COMBINED\",\r\n                          \"value\": 0\r\n                        }\r\n                      ],\r\n                      \"nox\": 0\r\n                    }\r\n                  }\r\n                ]\r\n              }\r\n            },\r\n            \"metadata\": {\r\n              \"auditData\": {\r\n                \"userId\": \"kcc\",\r\n                \"userName\": \"ADPadp11\"\r\n              }\r\n            }\r\n\t\r\n\t}\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/add-inventory-vehicle",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"add-inventory-vehicle"
+											]
+										},
+										"description": "Add the sales contact\t party to the sales order\t"
+									},
+									"response": []
+								},
+								{
+									"name": "CREATE a customer vehicle",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "5b5964ee-652d-445a-8da5-25fd3ce875bf",
+												"exec": [
+													"tests[\"Status code is 201\"] = responseCode.code === 201;",
+													"",
+													"if (responseCode.code === 201){",
+													"    var jsonData = JSON.parse(responseBody);",
+													"    tests[\"VehicleId\"] = jsonData.vehicleId !== null",
+													"    ",
+													"    pm.globals.set(\"CustVehicleId\", jsonData.vehicleId);",
+													"}",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"identification\": {\r\n\t  \"vin\": \"vn{{$timestamp}}\",\r\n\t  \"chassis\": \"cha{{$timestamp}}\",\r\n\t  \"licensePlate\": \"lic{{$timestamp}}\",\r\n\t  \"engineNumber\": \"string\"\r\n\t},\r\n\t\"description\": {\r\n\t  \"class\": \"UNKNOWN\",\r\n\t  \"make\": \"V\",\r\n\t  \"model\": \"SALOON\",\r\n\t  \"variant\": \"SUBMODEL1\",\r\n\t  \"modelYear\": 0,\r\n\t  \"vehicle\": \"10 LX\",\r\n\t  \"exteriorColor\": \"string\",\r\n\t  \"interiorColor\": \"string\"\r\n\t},\r\n\t\"referenceData\": [\r\n\t  {\r\n\t    \"providerId\": \"Test\",\r\n\t    \"makeCode\": \"VEH\",\r\n\t    \"modelCode\": \"SALOON\",\r\n\t    \"variantCode\": \"10LX\",\r\n\t    \"vehicleCode\": \"string\",\r\n\t    \"serviceGroupCode\": \"string\"\r\n\t  }\r\n\t],\r\n\t\"mileage\": {\r\n\t  \"unit\": \"KM\",\r\n\t  \"value\": 0\r\n\t},\r\n\t\"dates\": {\r\n\t  \"registrationDate\": \"2018-09-06T10:16:50.195Z\",\r\n\t  \"firstRegistrationDate\": \"2018-09-06T10:16:50.195Z\"\r\n\t}\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/vehicles",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"vehicles"
+											]
+										},
+										"description": "Search for existing customers based on the family name."
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Update - Add trade-in",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "77be1d7e-b8b5-4101-96cb-86b01f7f0999",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"",
+													"",
+													"    var jsonData = JSON.parse(responseBody);",
+													"    pm.environment.set(\"TradeInVehicleId\", jsonData.vehicleId);",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"tradeInVehicle\": {\r\n    \"description\": {\r\n      \"class\": \"CAR\",\r\n      \"make\": \"Volkswagen\",\r\n      \"model\": \"POLO HATCHBACK - 2009\",\r\n      \"variant\": \"1.2 60 Match 5dr\",\r\n      \"modelYear\": 0,\r\n      \"vehicle\": \"1.2 60 Match 5dr\",\r\n      \"exteriorColor\": \"Grey\",\r\n      \"interiorColor\": \"Black\"\r\n    },\r\n    \"identification\": {\r\n      \"vin\": \"WVWZZZ{{$timestamp}}\",\r\n      \"chassis\": null,\r\n      \"licensePlate\": \"TJZ7535\"\r\n    },\r\n    \"mileage\": {\r\n      \"mileageUnit\": \"KM\",\r\n      \"mileage\": 43125\r\n    },\r\n    \"referenceData\": {\r\n      \"providerId\": \"CAP\",\r\n      \"makeCode\": \"BEC\",\r\n      \"modelCode\": \"62670\",\r\n      \"variantCode\": \"58605\",\r\n      \"vehicleCode\": \"VWBE20DSN2BDTM  2   2013S\",\r\n      \"serviceGroupCode\": \"string\"\r\n    },\r\n    \"technicalData\": {\r\n      \"engineConcept\": \"DIESEL\",\r\n      \"engines\": [\r\n        {\r\n          \"engineType\": \"PRIMARY\",\r\n          \"fuelType\": \"DIESEL\",\r\n          \"engineNumber\": \"CFFD45165\",\r\n          \"cylinderCapacity\": 2143,\r\n          \"enginePower\": {\r\n            \"horsePower\": 0,\r\n            \"kiloWatts\": 0\r\n          }\r\n        }\r\n      ],\r\n      \"steering\": \"LEFT\",\r\n      \"transmission\": {\r\n        \"transmissionType\": \"AUTOMATIC\",\r\n        \"numberOfGears\": 0\r\n      },\r\n      \"numberOfDoors\": 5,\r\n      \"numberOfSeats\": 4,\r\n      \"electricRange\": null,\r\n      \"fuelTank\": {\r\n        \"capacity\": 45,\r\n        \"capacityUnit\": \"LITRES\"\r\n      }\r\n    },\r\n    \"dates\": {\r\n      \"registrationDate\": \"2017-02-26\",\r\n      \"firstRegistrationDate\": \"2015-01-10\"\r\n    },\r\n    \"valuationPrice\": {\r\n      \"netValue\": 9500,\r\n      \"grossValue\": 9500,\r\n      \"taxValue\": 0,\r\n      \"taxRate\": 0,\r\n      \"currencyCode\": \"GBP\"\r\n    },\r\n    \"outstandingFinanceValue\": {\r\n      \"netValue\": 1000,\r\n      \"grossValue\": 1000,\r\n      \"taxValue\": 0,\r\n      \"taxRate\": 0,\r\n      \"currencyCode\": \"GBP\"\r\n    },\r\n    \"offerPrice\": {\r\n      \"netValue\": 9500,\r\n      \"grossValue\": 9500,\r\n      \"taxValue\": 0,\r\n      \"taxRate\": 0,\r\n      \"currencyCode\": \"GBP\"\r\n    }\r\n  },\r\n  \"metadata\": {\r\n    \"auditData\": {\r\n      \"userId\": \"kcc\",\r\n      \"userName\": \"API Sales user\"\r\n    }\r\n  }\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/add-trade-in",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"add-trade-in"
+											]
+										},
+										"description": "Add the sales contact\t party to the sales order\t"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Update - Remove trade-in",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "ab101042-d7fe-4068-b2d4-378cb5d50f3f",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"vehicleId\": \"{{TradeInVehicleId}}\",\r\n  \"metadata\": {\r\n    \"auditData\": {\r\n      \"userId\": \"kcc\",\r\n      \"userName\": \"Sales API user\"\r\n    }\r\n  }\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/remove-trade-in",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"remove-trade-in"
+											]
+										},
+										"description": "Add the sales contact\t party to the sales order\t"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Confirm",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "d9bbafd5-8e42-4dd4-9b02-0f67e0d1ba57",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"metadata\": {\r\n    \"auditData\": {\r\n      \"userId\": \"{{UserId}}\",\r\n      \"userName\": \"API Sales user\"\r\n    }\r\n  }\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/confirm",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"confirm"
+											]
+										},
+										"description": "Add the sales contact\t party to the sales order\t"
+									},
+									"response": []
+								},
+								{
+									"name": "InventoryVehicle Create",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "c4a12f3a-fcdb-4fad-a7f9-c60c24b19361",
+												"exec": [
+													"tests[\"Status code is 201\"] = responseCode.code === 201;",
+													"",
+													"if (responseCode.code === 201) {",
+													"    var jsonData = JSON.parse(responseBody);",
+													"    tests[\"vehicleId\"] = jsonData.vehicleId !== null;",
+													"    ",
+													"    pm.globals.set(\"InventoryVehicleId\", jsonData.vehicleId);",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n            \"status\": \"AVAILABLE\",\r\n            \"inventoryType\": \"USED\",\r\n            \"identification\": {\r\n              \"commissionNumber\": \"test156\",\r\n              \"vin\": \"vin3224156\",\r\n              \"chassis\": \"chasis3224156\",\r\n              \"licensePlate\": \"lic156\",\r\n              \"engineNumber\": \"string\"\r\n            },\r\n            \"description\": {\r\n              \"class\": \"UNKNOWN\",\r\n              \"make\": \"V\",\r\n              \"model\": \"SALOON\",\r\n              \"variant\": \"SUBMODEL1\",\r\n              \"modelYear\": 0,\r\n              \"vehicle\": \"10 LX\",\r\n              \"exteriorColor\": \"string\",\r\n              \"interiorColor\": \"string\"\r\n            },\r\n            \"referenceData\": [\r\n              {\r\n                \"providerId\": \"Test\",\r\n                \"makeCode\": \"VEH\",\r\n                \"modelCode\": \"SALOON\",\r\n                \"variantCode\": \"10LX\",\r\n                \"vehicleCode\": \"string\",\r\n                \"serviceGroupCode\": \"string\"\r\n              }\r\n            ],\r\n            \"ownerDetails\": {\r\n              \"referenceData\": {\r\n                \"externalVehicleId\": \"string\"\r\n              },\r\n              \"contact\": {\r\n                \"companyName\": \"string\",\r\n                \"contactName\": \"string\",\r\n                \"addresses\": {\r\n                  \"physicalAddress\": {\r\n                    \"streetName\": \"string\",\r\n                    \"houseNumber\": \"string\",\r\n                    \"buildingName\": \"string\",\r\n                    \"floorNumber\": \"string\",\r\n                    \"doorNumber\": \"string\",\r\n                    \"blockName\": \"string\",\r\n                    \"postalCode\": \"string\",\r\n                    \"suburb\": \"string\",\r\n                    \"city\": \"string\",\r\n                    \"county\": \"string\",\r\n                    \"province\": \"string\",\r\n                    \"countryCode\": \"string\"\r\n                  },\r\n                  \"postalAddress\": {\r\n                    \"poBoxName\": \"string\",\r\n                    \"poBoxNumber\": \"string\",\r\n                    \"poBoxSuite\": \"string\",\r\n                    \"postalCode\": \"string\",\r\n                    \"suburb\": \"string\",\r\n                    \"city\": \"string\",\r\n                    \"county\": \"string\",\r\n                    \"province\": \"string\",\r\n                    \"countryCode\": \"string\"\r\n                  }\r\n                },\r\n                \"contactInformation\": {\r\n                  \"landline\": \"string\",\r\n                  \"fax\": \"string\",\r\n                  \"email\": \"string\"\r\n                }\r\n              }\r\n            },\r\n            \"specification\": {\r\n              \"primaryExteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"METALLIC\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"secondaryExteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"METALLIC\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"primaryInteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"LEATHER\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"secondaryInteriorColor\": {\r\n                \"code\": \"string\",\r\n                \"description\": \"string\",\r\n                \"colorType\": \"LEATHER\",\r\n                \"prices\": {\r\n                  \"costPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"listPrice\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  }\r\n                }\r\n              },\r\n              \"optionPacks\": [\r\n                {\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\",\r\n                  \"type\": \"MANUFACTURERSTANDARD\",\r\n                  \"packPrices\": {\r\n                    \"costPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    },\r\n                    \"listPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    }\r\n                  },\r\n                  \"options\": [\r\n                    {\r\n                      \"type\": \"MANUFACTURERSTANDARD\",\r\n                      \"code\": \"string\",\r\n                      \"description\": \"string\",\r\n                      \"optionPrices\": {\r\n                        \"costPrice\": {\r\n                          \"netValue\": 0,\r\n                          \"grossValue\": 0,\r\n                          \"taxValue\": 0,\r\n                          \"taxRate\": 0,\r\n                          \"currencyCode\": \"string\"\r\n                        },\r\n                        \"listPrice\": {\r\n                          \"netValue\": 0,\r\n                          \"grossValue\": 0,\r\n                          \"taxValue\": 0,\r\n                          \"taxRate\": 0,\r\n                          \"currencyCode\": \"string\"\r\n                        }\r\n                      }\r\n                    }\r\n                  ]\r\n                }\r\n              ],\r\n              \"options\": [\r\n                {\r\n                  \"type\": \"MANUFACTURERSTANDARD\",\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\",\r\n                  \"optionPrices\": {\r\n                    \"costPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    },\r\n                    \"listPrice\": {\r\n                      \"netValue\": 0,\r\n                      \"grossValue\": 0,\r\n                      \"taxValue\": 0,\r\n                      \"taxRate\": 0,\r\n                      \"currencyCode\": \"string\"\r\n                    }\r\n                  }\r\n                }\r\n              ]\r\n            },\r\n            \"mileage\": {\r\n              \"unit\": \"KM\",\r\n              \"value\": 0\r\n            },\r\n            \"dates\": {\r\n              \"registrationDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"firstRegistrationDate\": \"2018-07-19T04:22:58.102Z\"\r\n            },\r\n            \"prices\": {\r\n              \"listPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"costPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"deliveryPrice\": {\r\n                \"netValue\": 0,\r\n                \"grossValue\": 0,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"string\"\r\n              },\r\n              \"nonRecoverableCosts\": [\r\n                {\r\n                  \"actualCost\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"estimatedCost\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"string\"\r\n                  },\r\n                  \"code\": \"string\",\r\n                  \"description\": \"string\"\r\n                }\r\n              ]\r\n            },\r\n            \"isVatQualifyingVehicle\": true,\r\n            \"inventoryDates\": {\r\n              \"orderDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"buildDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"estimatedReceivedDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"receivedDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"availableForSaleDate\": \"2018-07-19T04:22:58.102Z\"\r\n            },\r\n            \"reservation\": {\r\n              \"reservationDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"reservedUntilDate\": \"2018-07-19T04:22:58.102Z\",\r\n              \"reservedBy\": {\r\n                \"salesPersonId\": \"string\",\r\n                \"name\": \"string\"\r\n              }\r\n            },\r\n            \"technicalData\": {\r\n              \"engineConcept\": \"UNKNOWN\",\r\n              \"primaryEngine\": {\r\n                \"fuelType\": \"DIESEL\",\r\n                \"engineNumber\": \"string\",\r\n                \"cylinderCapacity\": 0,\r\n                \"enginePower\": {\r\n                  \"horsePower\": 0,\r\n                  \"kiloWatts\": 0\r\n                }\r\n              },\r\n              \"secondaryEngine\": {\r\n                \"fuelType\": \"DIESEL\",\r\n                \"engineNumber\": \"string\",\r\n                \"cylinderCapacity\": 0,\r\n                \"enginePower\": {\r\n                  \"horsePower\": 0,\r\n                  \"kiloWatts\": 0\r\n                }\r\n              },\r\n              \"steering\": \"LEFT\",\r\n              \"transmission\": {\r\n                \"transmissionType\": \"AUTOMATIC\",\r\n                \"numberOfGears\": 0\r\n              },\r\n              \"numberOfDoors\": 0,\r\n              \"numberOfSeats\": 0,\r\n              \"electricRange\": {\r\n                \"unit\": \"KM\",\r\n                \"value\": 0\r\n              },\r\n              \"fuelTank\": {\r\n                \"capacity\": 0,\r\n                \"capacityUnit\": \"LITRES\"\r\n              },\r\n              \"testRegimeData\": {\r\n                \"regimeType\": \"NEDC\",\r\n                \"regimeData\": [\r\n                  {\r\n                    \"level\": \"TOTAL\",\r\n                    \"consumption\": {\r\n                      \"unit\": \"l/100km\",\r\n                      \"cycles\": [\r\n                        {\r\n                          \"type\": \"COMBINED\",\r\n                          \"value\": 0\r\n                        }\r\n                      ]\r\n                    },\r\n                    \"emission\": {\r\n                      \"unit\": \"g/km\",\r\n                      \"cycles\": [\r\n                        {\r\n                          \"type\": \"COMBINED\",\r\n                          \"value\": 0\r\n                        }\r\n                      ],\r\n                      \"nox\": 0\r\n                    }\r\n                  }\r\n                ]\r\n              }\r\n            },\r\n            \"metadata\": {\r\n              \"auditData\": {\r\n                \"userId\": \"kcc\",\r\n                \"userName\": \"ADPadp11\"\r\n              }\r\n            }\r\n          }"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/inventory-vehicles",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"inventory-vehicles"
+											]
+										},
+										"description": "Create an new inventory vehicle"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Create",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "753f3adc-4b9c-428e-953e-cb50750c3aa2",
+												"exec": [
+													"",
+													"pm.test(\"Status code is 201\", function () {",
+													"    pm.expect(pm.response.code).to.be.oneOf([201]);",
+													"});",
+													"",
+													"if (responseCode.code === 201) {",
+													"    let jsonData = pm.response.json();",
+													"    let salesOrderId = jsonData.salesOrderId",
+													"    if (salesOrderId !== null && salesOrderId !== \"\") {",
+													"        pm.globals.set(\"SalesOrderId\", salesOrderId);   ",
+													"        pm.test(\"SalesOrderId allocated \" + salesOrderId, function () {",
+													"            pm.expect(jsonData.salesOrderId).to.eql(salesOrderId);",
+													"        });",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"orderInformation\": {\r\n        \"externalSalesOrderReference\": \"27aa0f4d-7b8f-4a06-bb22-a88800e98019\",\r\n        \"orderDate\": \"2018-02-16T08:56:53.28Z\",\r\n        \"handOver\": {\r\n            \"deliveryDate\": \"2018-02-16T08:56:53.28Z\",\r\n            \"estimatedDeliveryDate\": \"2018-02-16T08:56:53.28Z\"\r\n        },\r\n        \"salesPerson\": {\r\n            \"salesPersonId\": \"api-sa01\",\r\n            \"name\": \"API Sales person\"\r\n        },\r\n        \"salesType\": \"RETAIL\",\r\n        \"comments\": \"Delivery date has been set\"\r\n    },\r\n    \"invoiceParties\": {\r\n        \"mainInvoiceParty\": {\r\n            \"payeeType\": \"FINANCE\",\r\n            \"payee\": {\r\n                \"customerId\": null,\r\n                \"companyId\": null,\r\n                \"payeeName\": \"Andrew Bell\",\r\n                \"addresses\": {\r\n                    \"home\": {\r\n                        \"physicalAddress\": {\r\n                            \"streetName\": \"Swanston Crescent\",\r\n                            \"houseNumber\": \"21\",\r\n                            \"buildingName\": null,\r\n                            \"floorNumber\": null,\r\n                            \"doorNumber\": null,\r\n                            \"blockName\": null,\r\n                            \"postalCode\": \"BT365DW\",\r\n                            \"suburb\": \"\",\r\n                            \"city\": \"Newtownabbey\",\r\n                            \"county\": \"County Antrim\",\r\n                            \"province\": null,\r\n                            \"countryCode\": \"EUR\"\r\n                        },\r\n                        \"postalAddress\": null\r\n                    }\r\n                },\r\n                \"contactInformation\": null\r\n            },\r\n            \"invoiceValue\": {\r\n                \"netValue\": 4491.83,\r\n                \"grossValue\": 5000,\r\n                \"taxValue\": 8.17,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            },\r\n            \"finance\": {\r\n                \"schemeName\": \"Scheme name\",\r\n                \"rate\": 10,\r\n                \"period\": 24,\r\n                \"periodUnit\": \"MONTH\",\r\n                \"periodPayment\": {\r\n                    \"netValue\": 250,\r\n                    \"grossValue\": 250,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"yearlyMileage\": 0,\r\n                \"mileageUnit\": \"KM\",\r\n                \"guaranteedFutureValue\": {\r\n                    \"netValue\": 0,\r\n                    \"grossValue\": 0,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"initialPayment\": {\r\n                    \"netValue\": 5100,\r\n                    \"grossValue\": 5100,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"financeType\": \"LEASE\"\r\n            },\r\n            \"deposit\": {\r\n                \"depositToPay\": {\r\n                    \"netValue\": 5000,\r\n                    \"grossValue\": 5000,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"depositsTaken\": [\r\n                    {\r\n                        \"amount\": {\r\n                            \"netValue\": 500,\r\n                            \"grossValue\": 500,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"paymentMethod\": \"CASH\",\r\n                        \"receiptNumber\": \"CashReceipt011\",\r\n                        \"notes\": \"Payed by card\"\r\n                    }\r\n                ]\r\n            }\r\n        },\r\n        \"supplementaryInvoiceParty\": {\r\n            \"payeeType\": \"INDIVIDUAL\",\r\n            \"payee\": {\r\n                \"customerId\": null,\r\n                \"companyId\": null,\r\n                \"payeeName\": \"Andrew Bell\",\r\n                \"addresses\": {\r\n                    \"home\": {\r\n                        \"physicalAddress\": {\r\n                            \"streetName\": \"Swanston Crescent\",\r\n                            \"houseNumber\": \"21\",\r\n                            \"buildingName\": null,\r\n                            \"floorNumber\": null,\r\n                            \"doorNumber\": null,\r\n                            \"blockName\": null,\r\n                            \"postalCode\": \"BT365DW\",\r\n                            \"suburb\": null,\r\n                            \"city\": \"Newtownabbey\",\r\n                            \"county\": \"County Antrim\",\r\n                            \"province\": null,\r\n                            \"countryCode\": \"GB\"\r\n                        },\r\n                        \"postalAddress\": null\r\n                    }\r\n                },\r\n                \"contactInformation\": null\r\n            },\r\n            \"invoiceValue\": {\r\n                \"netValue\": 100,\r\n                \"grossValue\": 100,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            },\r\n            \"finance\": null,\r\n            \"deposit\": {\r\n                \"depositToPay\": {\r\n                    \"netValue\": 100,\r\n                    \"grossValue\": 100,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"depositsTaken\": [\r\n                    {\r\n                        \"amount\": {\r\n                            \"netValue\": 100,\r\n                            \"grossValue\": 100,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"paymentMethod\": \"CASH\",\r\n                        \"receiptNumber\": \"445784\",\r\n                        \"notes\": \"\"\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    },\r\n    \"contactParties\": {\r\n        \"salesContact\": {\r\n            \"customerId\": null,\r\n            \"companyId\": null,\r\n            \"payeeName\": \"Andrew Bell\",\r\n            \"addresses\": {\r\n                \"home\": {\r\n                    \"physicalAddress\": {\r\n                        \"streetName\": \"Swanston Crescent\",\r\n                        \"houseNumber\": \"21\",\r\n                        \"buildingName\": null,\r\n                        \"floorNumber\": null,\r\n                        \"doorNumber\": null,\r\n                        \"blockName\": null,\r\n                        \"postalCode\": \"BT365DW\",\r\n                        \"suburb\": \"\",\r\n                        \"city\": \"Newtownabbey\",\r\n                        \"county\": \"County Antrim\",\r\n                        \"province\": null,\r\n                        \"countryCode\": \"GB\"\r\n                    },\r\n                    \"postalAddress\": null\r\n                }\r\n            },\r\n            \"contactInformation\": null\r\n        }\r\n    },\r\n    \"vehicles\": [\r\n        {\r\n            \"vehicleId\": \"{{InventoryVehicleId}}\",\r\n            \"prices\": {\r\n                \"listPrice\": {\r\n                    \"netValue\": 8688,\r\n                    \"grossValue\": 8688,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"costPrice\": null,\r\n                \"deliveryPrice\": {\r\n                    \"netValue\": 120,\r\n                    \"grossValue\": 120,\r\n                    \"taxValue\": 0,\r\n                    \"taxRate\": 0,\r\n                    \"currencyCode\": \"EUR\"\r\n                },\r\n                \"nonRecoverableCosts\": [\r\n                    {\r\n                        \"actualCost\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"string\"\r\n                        },\r\n                        \"estimatedCost\": {\r\n                            \"netValue\": 35.28,\r\n                            \"grossValue\": 35.28,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"code\": \"PLATES\",\r\n                        \"description\": \"Number Plates LXZ6710\"\r\n                    },\r\n                    {\r\n                        \"actualCost\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"string\"\r\n                        },\r\n                        \"estimatedCost\": {\r\n                            \"netValue\": 234,\r\n                            \"grossValue\": 234,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"code\": \"CHECKREP\",\r\n                        \"description\": \"Check and Report (Multipoint Check)\"\r\n                    },\r\n                    {\r\n                        \"actualCost\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"string\"\r\n                        },\r\n                        \"estimatedCost\": {\r\n                            \"netValue\": 150,\r\n                            \"grossValue\": 150,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"code\": \"LUBSERV\",\r\n                        \"description\": \"Lube Service\"\r\n                    },\r\n                    {\r\n                        \"actualCost\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"string\"\r\n                        },\r\n                        \"estimatedCost\": {\r\n                            \"netValue\": 260,\r\n                            \"grossValue\": 260,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"code\": \"HOUSECHG\",\r\n                        \"description\": \"House Charge\"\r\n                    }\r\n                ]\r\n            },\r\n            \"specification\": {\r\n                \"primaryExteriorColor\": {\r\n                    \"code\": \"133\",\r\n                    \"description\": \"Metallic black\",\r\n                    \"colorType\": \"METALLIC\",\r\n                    \"prices\": {\r\n                        \"costPrice\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"listPrice\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        }\r\n                    }\r\n                },\r\n                \"secondaryExteriorColor\": null,\r\n                \"primaryInteriorColor\": {\r\n                    \"code\": \"455\",\r\n                    \"description\": \"Nappa lether brown\",\r\n                    \"colorType\": \"LEATHER\",\r\n                    \"prices\": {\r\n                        \"costPrice\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        },\r\n                        \"listPrice\": {\r\n                            \"netValue\": 0,\r\n                            \"grossValue\": 0,\r\n                            \"taxValue\": 0,\r\n                            \"taxRate\": 0,\r\n                            \"currencyCode\": \"EUR\"\r\n                        }\r\n                    }\r\n                },\r\n                \"secondaryInteriorColor\": null,\r\n                \"optionPacks\": [],\r\n                \"options\": [\r\n                    {\r\n                        \"type\": \"DEALERINSTALLED\",\r\n                        \"code\": \"WARRAPPROV\",\r\n                        \"description\": \"Approved Volkswagen Warranty 12 mth\",\r\n                        \"optionPrices\": {\r\n                            \"costPrice\": null,\r\n                            \"listPrice\": {\r\n                                \"netValue\": 0,\r\n                                \"grossValue\": 0,\r\n                                \"taxValue\": 0,\r\n                                \"taxRate\": 0,\r\n                                \"currencyCode\": \"string\"\r\n                            }\r\n                        }\r\n                    },\r\n                    {\r\n                        \"type\": \"DEALERINSTALLED\",\r\n                        \"code\": \"DISCOUNT\",\r\n                        \"description\": \"Dealership Contribution\",\r\n                        \"optionPrices\": {\r\n                            \"costPrice\": null,\r\n                            \"listPrice\": {\r\n                                \"netValue\": -336,\r\n                                \"grossValue\": -336,\r\n                                \"taxValue\": 0,\r\n                                \"taxRate\": 0,\r\n                                \"currencyCode\": \"EUR\"\r\n                            }\r\n                        }\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ],\r\n    \"tradeInVehicles\": [\r\n        {\r\n            \"vehicleId\": null,\r\n            \"description\": {\r\n                \"class\": \"CAR\",\r\n                \"make\": \"Volkswagen\",\r\n                \"model\": \"POLO HATCHBACK - 2009\",\r\n                \"variant\": \"1.2 60 Match 5dr\",\r\n                \"modelYear\": 0,\r\n                \"vehicle\": \"1.2 60 Match 5dr\",\r\n                \"exteriorColor\": \"Grey\",\r\n                \"interiorColor\": \"Black\"\r\n            },\r\n            \"identification\": {\r\n                \"vin\": \"WVWZZZ6RZCU064781\",\r\n                \"chassis\": null,\r\n                \"licensePlate\": \"TJZ7536\",\r\n                \"engineNumber\": \"CFFD45166\"\r\n            },\r\n             \"mileage\": {\r\n\t\t        \"unit\": \"KM\",\r\n\t\t        \"value\": 2\r\n\t\t    },\r\n            \"referenceData\": {\r\n                \"providerId\": \"CAP\",\r\n                \"makeCode\": \"BEC\",\r\n                \"modelCode\": \"62670\",\r\n                \"variantCode\": \"58605\",\r\n                \"vehicleCode\": \"VWBE20DSN2BDTM  2   2013S\",\r\n                \"serviceGroupCode\": \"string\"\r\n            },\r\n            \"technicalData\": {\r\n                \"engineConcept\": \"DIESEL\",\r\n                \"engines\": [\r\n                    {\r\n                        \"engineType\": \"PRIMARY\",\r\n                        \"fuelType\": \"DIESEL\",\r\n                        \"engineNumber\": \"CFFD45166\",\r\n                        \"cylinderCapacity\": 2143,\r\n                        \"enginePower\": {\r\n                            \"horsePower\": 0,\r\n                            \"kiloWatts\": 0\r\n                        }\r\n                    }\r\n                ],\r\n                \"steering\": \"LEFT\",\r\n                \"transmission\": {\r\n                    \"transmissionType\": \"AUTOMATIC\",\r\n                    \"numberOfGears\": 0\r\n                },\r\n                \"numberOfDoors\": 5,\r\n                \"numberOfSeats\": 4,\r\n                \"electricRange\": null,\r\n                \"fuelTank\": {\r\n                    \"capacity\": 45,\r\n                    \"capacityUnit\": \"LITRES\"\r\n                },\r\n                \"testRegimeData\": null\r\n            },\r\n            \"dates\": {\r\n                \"registrationDate\": \"2017-02-26\",\r\n                \"firstRegistrationDate\": \"2015-01-10\"\r\n            },\r\n            \"valuationPrice\": {\r\n                \"netValue\": 8570,\r\n                \"grossValue\": 8570,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            },\r\n            \"outstandingFinanceValue\": {\r\n                \"netValue\": 1000,\r\n                \"grossValue\": 1000,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            },\r\n            \"offerPrice\": {\r\n                \"netValue\": 9500,\r\n                \"grossValue\": 9500,\r\n                \"taxValue\": 0,\r\n                \"taxRate\": 0,\r\n                \"currencyCode\": \"EUR\"\r\n            }\r\n        }\r\n    ],\r\n    \"metadata\": {\r\n    \"auditData\": {\r\n      \"userId\": \"kcc\",\r\n      \"userName\": \"string\"\r\n    }\r\n  }\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders"
+											]
+										},
+										"description": "Create a new sales order containing only the orderInformation section"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Get (Validate)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "11116cf2-252a-455b-98f0-00bffde6ff4c",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"",
+													"if (responseCode.code === 200) {",
+													"    let jsonData = pm.response.json();",
+													"    let salesOrderId = pm.globals.get(\"SalesOrderId\");",
+													"    pm.test(\"SalesOrderId correct\" + salesOrderId, function () {",
+													"        pm.expect(jsonData.salesOrderId).to.eql(salesOrderId);",
+													"    });",
+													"}",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}"
+											]
+										},
+										"description": "Get an existing sales order by the SalesOrderID"
+									},
+									"response": []
+								},
+								{
+									"name": "SalesOrder Cancel",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "c5f84193-c939-4c1e-9157-75fed5cb72df",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{authorisation_key}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "correlation-id",
+												"value": "{{$guid}}"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"metadata\": {\r\n    \"auditData\": {\r\n      \"userId\": \"kcc\",\r\n      \"userName\": \"API Sales user\"\r\n    }\r\n  }\r\n}"
+										},
+										"url": {
+											"raw": "{{GatewayUrl}}/{{domain}}/{{contractCode}}/{{businessUnit}}/v1/sales-orders/{{SalesOrderId}}/cancel",
+											"host": [
+												"{{GatewayUrl}}"
+											],
+											"path": [
+												"{{domain}}",
+												"{{contractCode}}",
+												"{{businessUnit}}",
+												"v1",
+												"sales-orders",
+												"{{SalesOrderId}}",
+												"cancel"
+											]
+										},
+										"description": "Add the sales contact\t party to the sales order\t"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	]
+}
